@@ -1,0 +1,6 @@
+---
+scrape_configs:
+  - job_name: 'weather-exporter'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['weather-exporter:8080']
