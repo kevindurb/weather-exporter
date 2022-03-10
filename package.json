@@ -19,6 +19,7 @@
   "homepage": "https://github.com/kevindurb/weather-exporter#readme",
   "dependencies": {
     "@types/node": "^16.11.26",
+    "cardinal-direction": "^1.1.1",
     "node-fetch": "^3.2.2"
   }
 }

@@ -1,5 +1,6 @@
 import http from 'http';
 import fetch from 'node-fetch';
+import Compass from 'cardinal-direction';
 
 const latitude = parseFloat(process.env.LATITUDE);
 const longitude = parseFloat(process.env.LONGITUDE);
@@ -35,19 +36,38 @@ const server = http.createServer(async (request, response) => {
     const forecast = await getForecast(pointData);
 
     const current = forecast.properties.periods[0];
+    const currentTemp = current.temperature;
+    const windDirection = Compass.degreeFromCardinal(current.windDirection);
+    const windSpeed = parseInt(current.windSpeed, 10);
 
-    const output = `
-${buildMetric(
-  'weather_current_temperature',
-  'gauge',
-  'current temperature in F',
-)}
-${buildMetricValue('weather_current_temperature', current.temperature, {
-  latitude,
-  longitude,
-})}`;
-    console.log(output);
-    response.write(output);
+    const lines = [
+      buildMetric(
+        'weather_current_temperature',
+        'gauge',
+        'current temperature in F',
+      ),
+      buildMetricValue('weather_current_temperature', currentTemp, {
+        latitude,
+        longitude,
+      }),
+      buildMetric(
+        'weather_current_wind_direction',
+        'gauge',
+        'wind direction in deg',
+      ),
+      buildMetricValue('weather_current_wind_direction', windDirection, {
+        latitude,
+        longitude,
+      }),
+      buildMetric('weather_current_wind_speed', 'gauge', 'wind speed in mph'),
+      buildMetricValue('weather_current_wind_speed', windSpeed, {
+        latitude,
+        longitude,
+      }),
+    ];
+
+    console.log(lines.join('\n'));
+    response.write(lines.join('\n'));
     response.end();
   } catch (e) {
     console.error(e);
